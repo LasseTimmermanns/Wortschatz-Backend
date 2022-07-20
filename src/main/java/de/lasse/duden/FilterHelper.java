@@ -1,0 +1,61 @@
+package de.lasse.duden;
+
+import de.lasse.duden.database.FilterObj;
+import de.lasse.duden.database.Word;
+import de.lasse.duden.database.WordRepository;
+import org.hibernate.Filter;
+import org.hibernate.Session;
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
+import java.util.List;
+
+public class FilterHelper {
+
+    public static ArrayList<Word> processWithAllFilters(int frequencyValue, String[] kindValues, String[] utilizationValues,
+                                                        EntityManager entityManager, WordRepository wordRepository){
+        ArrayList<Word> output = new ArrayList<Word>();
+        ArrayList<FilterObj> filters = new ArrayList<FilterObj>();
+        for (String kind : kindValues) {
+            if (frequencyValue != -1)
+                filters.add(new FilterObj("frequencyFilter", "minFrequency", frequencyValue));
+            for (String utilization : utilizationValues) {
+                if (utilization != "allowAll")
+                    filters.add(new FilterObj("utilizationFilter", "utilization", utilization));
+            }
+            if (kind != "allowAll")
+                filters.add(new FilterObj("kindFilter", "kind", kind));
+
+            output.addAll(getWithFilters(filters, entityManager, wordRepository));
+
+            filters.clear();
+        }
+        return output;
+    }
+
+    public static JSONArray reformatWordsToJsonArray(ArrayList<Word> words){
+        JSONArray out = new JSONArray();
+        for (Word w : words) out.put(w.toJsonObject());
+        return out;
+    }
+
+    public static List<Word> getWithFilters(ArrayList<FilterObj> filters, EntityManager entityManager, WordRepository wordRepository) {
+        List<Word> output;
+        Session session = entityManager.unwrap(Session.class);
+
+        for (FilterObj filter : filters) {
+            Filter newFilter = session.enableFilter(filter.getName());
+            newFilter.setParameter(filter.getParameterName(), filter.getParameter());
+        }
+
+        output = wordRepository.findAll();
+
+        for (FilterObj filter : filters) session.disableFilter(filter.getName());
+
+        return output;
+    }
+
+}
