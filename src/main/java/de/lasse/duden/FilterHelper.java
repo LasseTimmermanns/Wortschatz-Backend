@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FilterHelper {
@@ -34,6 +35,22 @@ public class FilterHelper {
             filters.clear();
         }
         return output;
+    }
+
+    public static ArrayList<Word> getRandomWordsLimited(ArrayList<Word> in, int limit){
+        if(in.size() <= limit) {
+            Collections.shuffle(in);
+            return in;
+        }
+
+        ArrayList<Word> out = new ArrayList<>();
+        for(int i = 0; i < limit; i++){
+            int random = (int) (Math.random() * in.size());
+            out.add(in.get(random));
+            in.remove(random);
+        }
+
+        return out;
     }
 
     public static JSONArray reformatWordsToJsonArray(ArrayList<Word> words){

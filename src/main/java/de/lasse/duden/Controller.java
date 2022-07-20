@@ -42,9 +42,13 @@ public class Controller {
     @GetMapping("/getWords")
     public ResponseEntity<String> getWords(@RequestParam("frequency") Optional<Integer> frequencyParam,
                                            @RequestParam("utilization") Optional<String[]> utilizationParam,
-                                           @RequestParam("kind") Optional<String[]> kindParam) {
+                                           @RequestParam("kind") Optional<String[]> kindParam,
+                                           @RequestParam("limit") Optional<Integer> limitParam) {
+
+        long time = System.currentTimeMillis();
 
         int frequencyValue = frequencyParam.orElse(-1);
+        int limitValue = limitParam.orElse(20);
         String[] utilizationValues = utilizationParam.orElse(new String[]{"allowAll"});
         String[] kindValues = kindParam.orElse(new String[]{"allowAll"});
 
@@ -52,7 +56,9 @@ public class Controller {
                 FilterHelper.processWithAllFilters(frequencyValue, kindValues, utilizationValues, entityManager, wordRepository);
 
         HttpHeaders responseHeaders = new HttpHeaders();
-        return new ResponseEntity<String>(FilterHelper.reformatWordsToJsonArray(wordArrayList).toString(), responseHeaders, HttpStatus.OK);
+        ArrayList<Word> output = FilterHelper.getRandomWordsLimited(wordArrayList, limitValue);
+        System.out.println("Processed Time: " + (System.currentTimeMillis() - time));
+        return new ResponseEntity<String>(FilterHelper.reformatWordsToJsonArray(output).toString(), responseHeaders, HttpStatus.OK);
     }
 
 }
