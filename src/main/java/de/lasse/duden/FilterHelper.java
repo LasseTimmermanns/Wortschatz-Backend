@@ -21,14 +21,18 @@ public class FilterHelper {
         for (String kind : kindValues) {
             if (frequencyValue != -1)
                 filters.add(new FilterObj("frequencyFilter", "minFrequency", frequencyValue));
+            if (kind != "allowAll")
+                filters.add(new FilterObj("kindFilter", "kind", kind));
             for (String utilization : utilizationValues) {
                 if (utilization != "allowAll")
                     filters.add(new FilterObj("utilizationFilter", "utilization", utilization));
-            }
-            if (kind != "allowAll")
-                filters.add(new FilterObj("kindFilter", "kind", kind));
 
-            output.addAll(getWithFilters(filters, entityManager, wordRepository));
+                output.addAll(getWithFilters(filters, entityManager, wordRepository));
+
+                if(utilization != "allowAll")
+                    filters.remove(filters.size() - 1);
+            }
+
             filters.clear();
         }
         return output;
@@ -58,14 +62,22 @@ public class FilterHelper {
 
     public static List<Word> getWithFilters(ArrayList<FilterObj> filters, EntityManager entityManager, WordRepository wordRepository) {
         List<Word> output;
+        System.out.println("----------------------------");
+        System.out.println("----------------------------");
+        System.out.println("----------------------------");
+        System.out.println("----------------------------");
         Session session = entityManager.unwrap(Session.class);
 
         for (FilterObj filter : filters) {
+            System.out.println("FILTER = " + filter.getParameter());
             Filter newFilter = session.enableFilter(filter.getName());
             newFilter.setParameter(filter.getParameterName(), filter.getParameter());
         }
 
         output = wordRepository.findAll();
+        for(Word w : output){
+            System.out.println(w.getUtilization());
+        }
 
         for (FilterObj filter : filters) session.disableFilter(filter.getName());
 
