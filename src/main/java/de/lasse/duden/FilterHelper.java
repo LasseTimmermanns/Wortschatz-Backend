@@ -6,10 +6,8 @@ import de.lasse.duden.database.WordRepository;
 import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.json.JSONArray;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +29,6 @@ public class FilterHelper {
                 filters.add(new FilterObj("kindFilter", "kind", kind));
 
             output.addAll(getWithFilters(filters, entityManager, wordRepository));
-
             filters.clear();
         }
         return output;
