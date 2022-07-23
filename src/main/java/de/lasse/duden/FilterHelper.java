@@ -62,22 +62,14 @@ public class FilterHelper {
 
     public static List<Word> getWithFilters(ArrayList<FilterObj> filters, EntityManager entityManager, WordRepository wordRepository) {
         List<Word> output;
-        System.out.println("----------------------------");
-        System.out.println("----------------------------");
-        System.out.println("----------------------------");
-        System.out.println("----------------------------");
         Session session = entityManager.unwrap(Session.class);
 
         for (FilterObj filter : filters) {
-            System.out.println("FILTER = " + filter.getParameter());
             Filter newFilter = session.enableFilter(filter.getName());
             newFilter.setParameter(filter.getParameterName(), filter.getParameter());
         }
 
         output = wordRepository.findAll();
-        for(Word w : output){
-            System.out.println(w.getUtilization());
-        }
 
         for (FilterObj filter : filters) session.disableFilter(filter.getName());
 
