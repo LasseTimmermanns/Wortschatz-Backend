@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/login")
@@ -47,7 +49,9 @@ public class LoginController {
     }
 
     ResponseEntity<String> createResponse(String message, int responseCode){
-        JSONObject jsonObject = new JSONObject();
+        return createResponse(message, new JSONObject(), responseCode);
+    }
+    ResponseEntity<String> createResponse(String message, JSONObject jsonObject, int responseCode){
         jsonObject.put("response_code", responseCode);
         jsonObject.put("message", message);
 
@@ -62,11 +66,15 @@ public class LoginController {
         if(!userExists(username))
             return createResponse("no user found with this username", 400);
 
-        if(userRepository.findUserByUsernameAndPassword(username, password.hashCode()) == null)
+        User user = userRepository.findUserByUsernameAndPassword(username, password.hashCode());
+
+        if(user == null)
             return createResponse("password doesnt match to username", 400);
 
-        return createResponse("User found", 200);
-
+        JSONObject response = new JSONObject();
+        response.put("username", user.getUsername());
+        response.put("uuid", user.getUuid());
+        return createResponse("User found", response, 200);
     }
 
 
