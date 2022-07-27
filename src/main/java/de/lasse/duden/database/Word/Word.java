@@ -1,4 +1,4 @@
-package de.lasse.duden.database;
+package de.lasse.duden.database.Word;
 
 import org.hibernate.annotations.*;
 import org.json.JSONObject;

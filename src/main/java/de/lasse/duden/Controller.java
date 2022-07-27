@@ -1,7 +1,7 @@
 package de.lasse.duden;
 
-import de.lasse.duden.database.Word;
-import de.lasse.duden.database.WordRepository;
+import de.lasse.duden.database.Word.Word;
+import de.lasse.duden.database.Word.WordRepository;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api")
@@ -48,10 +47,10 @@ public class Controller {
         for(String s : in){
             if(i > limitValue) break;
             String[] parts = s.split(",");
-            if(parts[0] == "null") continue;
+            if(parts[0].equals("null")) continue;
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("utilization", parts[0]);
-            jsonObject.put("count", parts[1]);
+            jsonObject.put("count", parts[parts.length - 1]);
             out.put(jsonObject);
             i++;
         }

@@ -1,8 +1,8 @@
 package de.lasse.duden;
 
 import de.lasse.duden.database.FilterObj;
-import de.lasse.duden.database.Word;
-import de.lasse.duden.database.WordRepository;
+import de.lasse.duden.database.Word.Word;
+import de.lasse.duden.database.Word.WordRepository;
 import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.json.JSONArray;
