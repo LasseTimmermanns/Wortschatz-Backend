@@ -24,27 +24,26 @@ public class LoginController {
     public ResponseEntity<String> register(@RequestParam("username") String username,
                                              @RequestParam("password") String password) {
 
-        if(userRepository.findUserByUsername(username) != null)
-            return createResponse("User already exists", 401);
+        if(userExists(username))
+            return createResponse("user already exists", 401);
 
         if(!username.matches("[a-zA-Z0-9_-]*"))
-            return createResponse("Username contains unallowed characters", 400);
+            return createResponse("username contains unallowed characters", 400);
 
         if(username.length() < 3)
-            return createResponse("Username has to be bigger than 3", 400);
+            return createResponse("username has to be bigger than 3", 400);
 
         if(password.length() < 8)
-            return createResponse("Password has to be bigger than 8", 400);
+            return createResponse("password has to be bigger than 8", 400);
 
         if(!password.matches("[a-zA-Z0-9_-]*"))
-            return createResponse("Username has invalid characters", 400);
+            return createResponse("username has invalid characters", 400);
 
 
         User user = new User(username, password);
         userRepository.save(user);
 
-        return createResponse("Created User", 200);
-
+        return createResponse("created User", 200);
     }
 
     ResponseEntity<String> createResponse(String message, int responseCode){
@@ -63,6 +62,11 @@ public class LoginController {
         HttpHeaders responseHeaders = new HttpHeaders();
         System.out.println(username + " " + password);
         return new ResponseEntity<String>("jea", responseHeaders, HttpStatus.OK);
+    }
+
+
+    public boolean userExists(String username){
+        return userRepository.findUserByUsername(username) != null;
     }
 
 }

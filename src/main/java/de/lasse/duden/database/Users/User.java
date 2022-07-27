@@ -1,5 +1,7 @@
 package de.lasse.duden.database.Users;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -69,4 +71,8 @@ public class User {
     public int hashCode() {
         return Objects.hash(uuid, username, password);
     }
+
+
+
+
 }
