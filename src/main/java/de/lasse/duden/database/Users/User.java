@@ -3,6 +3,7 @@ package de.lasse.duden.database.Users;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -45,5 +46,27 @@ public class User {
 
     public void setPassword(int password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "uuid='" + uuid + '\'' +
+                ", username='" + username + '\'' +
+                ", password=" + password +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return password == user.password && Objects.equals(uuid, user.uuid) && Objects.equals(username, user.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid, username, password);
     }
 }
