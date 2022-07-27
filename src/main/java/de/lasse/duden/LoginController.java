@@ -59,9 +59,14 @@ public class LoginController {
     public ResponseEntity<String> login(@RequestParam("username") String username,
                                         @RequestParam("password") String password){
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        System.out.println(username + " " + password);
-        return new ResponseEntity<String>("jea", responseHeaders, HttpStatus.OK);
+        if(!userExists(username))
+            return createResponse("no user found with this username", 400);
+
+        if(userRepository.findUserByUsernameAndPassword(username, password.hashCode()) == null)
+            return createResponse("password doesnt match to username", 400);
+
+        return createResponse("User found", 200);
+
     }
 
 
