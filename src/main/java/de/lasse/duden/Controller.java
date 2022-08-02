@@ -1,5 +1,8 @@
 package de.lasse.duden;
 
+import de.lasse.duden.database.Users.User;
+import de.lasse.duden.database.Users.UserRepository;
+import de.lasse.duden.database.Users.UserUtil;
 import de.lasse.duden.database.Word.Word;
 import de.lasse.duden.database.Word.WordRepository;
 import org.json.JSONArray;
@@ -15,6 +18,7 @@ import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api")
@@ -24,8 +28,44 @@ public class Controller {
     @Autowired
     WordRepository wordRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    UserUtil userUtil;
+
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    TokenValidator tokenValidator;
+
+    @PostMapping("/create/session")
+    public ResponseEntity<String> createUserAndSession(@RequestParam("idToken") Optional<String> optIdToken){
+        String idToken = optIdToken.orElse("none");
+
+        String subject = tokenValidator.getSubject(idToken);
+        if(subject == null){
+            Logger.getGlobal().info("User tried to get new Session with invalid idToken");
+            return ResponseGenerator.createResponse("invalid idToken", HttpStatus.FORBIDDEN.value());
+        }
+
+        User user = userRepository.findUserBySubject(subject);
+
+        if(user == null) user = userUtil.createUser(subject);
+
+        User updated = user.createSession();
+        userRepository.save(updated);
+
+        Logger.getGlobal().info("Created new Session successful");
+
+        JSONObject out = new JSONObject()
+                .put("session_token", updated.getSessionToken())
+                .put("session_iat", updated.getSessionIat())
+                .put("session_exp", updated.getSessionExp());
+
+        return ResponseGenerator.createResponse("Created new Session", out, HttpStatus.OK.value());
+    }
 
     @GetMapping("/foo")
     public ResponseEntity<String> getFoooooo(@RequestParam("word") String word_key) {

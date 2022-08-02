@@ -10,10 +10,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class DudenApplication {
 
+    public static ConfigurableApplicationContext applicationContext;
+
     public static void main(String[] args) {
-        ConfigurableApplicationContext applicationContext = SpringApplication.run(DudenApplication.class, args);
-        WordRepository wordRepository = applicationContext.getBean(WordRepository.class);
-        UserRepository userRepository = applicationContext.getBean(UserRepository.class);
+        applicationContext = SpringApplication.run(DudenApplication.class, args);
     }
 
 }
