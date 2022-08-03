@@ -23,7 +23,7 @@ public class ResponseGenerator {
         jsonObject.put("message", message);
         jsonObject.put("display_message", displayMessage);
 
-        return new ResponseEntity<String>(jsonObject.toString(), new HttpHeaders(), responseCode);
+        return new ResponseEntity<>(jsonObject.toString(), new HttpHeaders(), responseCode);
     }
 
 }

@@ -1,14 +1,8 @@
 package de.lasse.duden.database.Users;
 
-import de.lasse.duden.database.Word.Word;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
-
-@Repository
-public interface UserRepository extends CrudRepository<User, String> {
+public interface UserRepository extends MongoRepository<User, String> {
 
     User findUserBySubject(String subject);
 

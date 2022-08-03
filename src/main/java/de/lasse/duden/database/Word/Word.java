@@ -1,40 +1,16 @@
 package de.lasse.duden.database.Word;
 
-import org.hibernate.annotations.*;
 import org.json.JSONObject;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 
-
-/*@FilterDefs({
-        @FilterDef(name = "kindFilter",
-                parameters = @ParamDef(name = "kind", type = "java.lang.String")),
-        @FilterDef(name = "frequencyFilter",
-                parameters = @ParamDef(name = "frequency", type = "java.lang.short")),
-
-})
-@Filter(name = "kindFilter")*/
-@FilterDef(name="frequencyFilter",
-        parameters = @ParamDef( name="minFrequency", type="integer" ),
-        defaultCondition = "frequency >= :minFrequency")
-@FilterDef(name="kindFilter",
-        parameters = @ParamDef( name="kind", type="java.lang.String" ),
-        defaultCondition = "kind = :kind")
-@FilterDef(name="utilizationFilter",
-        parameters = @ParamDef( name="utilization", type="java.lang.String" ),
-        defaultCondition = "utilization = :utilization")
-
-@Entity
-@Table(name = "dictionary")
-@Filter(name = "frequencyFilter")
-@Filter(name = "kindFilter")
-@Filter(name = "utilizationFilter")
+@Document(collection="Dictionary")
 public class Word {
 
     @Id
+    private String id;
+
     private String word;
 
     private String kind, utilization, synonyms, description;
@@ -75,4 +51,6 @@ public class Word {
         obj.put("description", this.description);
         return obj;
     }
+
+
 }

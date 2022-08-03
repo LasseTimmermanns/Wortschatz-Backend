@@ -1,16 +1,13 @@
 package de.lasse.duden;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson.JacksonFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.logging.Logger;
 
-//@Qualifier("tokenValidator")
 @Service
 public class TokenValidator {
 
@@ -35,7 +32,6 @@ public class TokenValidator {
         }
 
         if(idToken == null) return null;
-
         return idToken.getPayload().getSubject();
     }
 }

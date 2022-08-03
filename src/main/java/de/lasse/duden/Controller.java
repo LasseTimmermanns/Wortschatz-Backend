@@ -3,9 +3,10 @@ package de.lasse.duden;
 import de.lasse.duden.database.Users.User;
 import de.lasse.duden.database.Users.UserRepository;
 import de.lasse.duden.database.Users.UserUtil;
-import de.lasse.duden.database.Word.Word;
+import de.lasse.duden.database.Utilization.UtilizationDisplay;
+import de.lasse.duden.database.Utilization.UtilizationRepository;
 import de.lasse.duden.database.Word.WordRepository;
-import org.json.JSONArray;
+import de.lasse.duden.database.Word.Word;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -13,11 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 
 @RestController
@@ -25,17 +22,18 @@ import java.util.logging.Logger;
 @CrossOrigin
 public class Controller {
 
+
     @Autowired
-    WordRepository wordRepository;
+    UserUtil userUtil;
 
     @Autowired
     UserRepository userRepository;
 
     @Autowired
-    UserUtil userUtil;
+    WordRepository wordRepository;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    UtilizationRepository utilizationRepository;
 
     @Autowired
     TokenValidator tokenValidator;
@@ -67,57 +65,39 @@ public class Controller {
         return ResponseGenerator.createResponse("Created new Session", out, HttpStatus.OK.value());
     }
 
+    @GetMapping("/get/utilization")
+    public ResponseEntity<List<UtilizationDisplay>> getUtilizations(@RequestParam("limit") Optional<Integer> limit) {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        if(limit.isEmpty())
+            Logger.getGlobal().info("Utilization get without limitInt");
+
+        int limitInt = limit.orElse(100);
+        return new ResponseEntity<>(utilizationRepository.getUtilizations(limitInt), responseHeaders, HttpStatus.OK);
+    }
+
     @GetMapping("/foo")
-    public ResponseEntity<String> getFoooooo(@RequestParam("word") String word_key) {
+    public ResponseEntity<String> getFoooooo() {
         HttpHeaders responseHeaders = new HttpHeaders();
-        //JSONArray jsonArray = new JSONArray(wordRepository.findAllDistinctUtilization());
-        return new ResponseEntity<String>(wordRepository.findAllDistinctUtilization().toString(), responseHeaders, HttpStatus.OK);
+        return new ResponseEntity<String>("bar", responseHeaders, HttpStatus.OK);
     }
 
-    @GetMapping("/utilization")
-    public ResponseEntity<String> getUtilization(@RequestParam("limit") Optional<Integer> limitParam) {
-        HttpHeaders responseHeaders = new HttpHeaders();
-
-        int limitValue = limitParam.orElse(1000);
-
-        List<String> in = wordRepository.findAllDistinctUtilization();
-        JSONArray out = new JSONArray();
-
-        int i = 0;
-        for(String s : in){
-            if(i > limitValue) break;
-            String[] parts = s.split(",");
-            if(parts[0].equals("null")) continue;
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("utilization", parts[0]);
-            jsonObject.put("count", parts[parts.length - 1]);
-            out.put(jsonObject);
-            i++;
-        }
-
-        return new ResponseEntity<String>(out.toString(), responseHeaders, HttpStatus.OK);
-    }
-
-    @GetMapping("/getWords")
-    public ResponseEntity<String> getWords(@RequestParam("frequency") Optional<Integer> frequencyParam,
-                                           @RequestParam("utilization") Optional<String[]> utilizationParam,
-                                           @RequestParam("kind") Optional<String[]> kindParam,
-                                           @RequestParam("limit") Optional<Integer> limitParam) {
+    @GetMapping("/get/words")
+    public ResponseEntity<List<Word>> getWords(@RequestParam("frequency") Optional<Integer> frequencyParam,
+                                               @RequestParam("utilization") Optional<String[]> utilizationParam,
+                                               @RequestParam("kind") Optional<String[]> kindParam,
+                                               @RequestParam("limit") Optional<Integer> limitParam) {
 
         long time = System.currentTimeMillis();
 
-        int frequencyValue = frequencyParam.orElse(-1);
-        int limitValue = limitParam.orElse(20);
-        String[] utilizationValues = utilizationParam.orElse(new String[]{"allowAll"});
-        String[] kindValues = kindParam.orElse(new String[]{"allowAll"});
-
-        ArrayList<Word> wordArrayList =
-                FilterHelper.processWithAllFilters(frequencyValue, kindValues, utilizationValues, entityManager, wordRepository);
+        int frequency = frequencyParam.orElse(1);
+        int limit = limitParam.orElse(5);
+        Collection<String> utilization = Arrays.asList(utilizationParam.orElse(new String[]{}));
+        Collection<String> kind = Arrays.asList(kindParam.orElse(new String[]{}));
 
         HttpHeaders responseHeaders = new HttpHeaders();
-        ArrayList<Word> output = FilterHelper.getRandomWordsLimited(wordArrayList, limitValue);
-        System.out.println("Processed Time: " + (System.currentTimeMillis() - time));
-        return new ResponseEntity<String>(FilterHelper.reformatWordsToJsonArray(output).toString(), responseHeaders, HttpStatus.OK);
+        List<Word> output = wordRepository.getWordsWithFilter(utilization, kind, frequency, limit);
+        Logger.getGlobal().info("Processed Time: " + (System.currentTimeMillis() - time));
+        return new ResponseEntity<List<Word>>(output, responseHeaders, HttpStatus.OK);
     }
 
 }

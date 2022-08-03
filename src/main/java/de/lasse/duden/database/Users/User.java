@@ -1,22 +1,20 @@
 package de.lasse.duden.database.Users;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-@Entity
-@Table(name = "users")
+@Document(collection = "Users")
 public class User {
 
     @Id
-    @Column(name = "subject")
+    @Field(name = "subject")
     private String subject;
-    @Column(name = "session_token")
+    @Field(name = "session_token")
     private String sessionToken;
-    @Column(name = "session_iat")
+    @Field(name = "session_iat")
     private long sessionIat;
-    @Column(name = "session_exp")
+    @Field(name = "session_exp")
     private long sessionExp;
 
 
