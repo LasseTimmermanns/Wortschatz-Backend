@@ -67,12 +67,15 @@ public class Controller {
 
     @GetMapping("/get/utilization")
     public ResponseEntity<List<UtilizationDisplay>> getUtilizations(@RequestParam("limit") Optional<Integer> limit) {
+        long time = System.currentTimeMillis();
         HttpHeaders responseHeaders = new HttpHeaders();
         if(limit.isEmpty())
             Logger.getGlobal().info("Utilization get without limitInt");
 
         int limitInt = limit.orElse(100);
-        return new ResponseEntity<>(utilizationRepository.getUtilizations(limitInt), responseHeaders, HttpStatus.OK);
+        List list = utilizationRepository.getUtilizations(limitInt);
+        Logger.getGlobal().info("Utilization Processed Time: " + (System.currentTimeMillis() - time));
+        return new ResponseEntity<>(list, responseHeaders, HttpStatus.OK);
     }
 
     @GetMapping("/foo")
@@ -96,7 +99,7 @@ public class Controller {
 
         HttpHeaders responseHeaders = new HttpHeaders();
         List<Word> output = wordRepository.getWordsWithFilter(utilization, kind, frequency, limit);
-        Logger.getGlobal().info("Processed Time: " + (System.currentTimeMillis() - time));
+        Logger.getGlobal().info("Words Processed Time: " + (System.currentTimeMillis() - time));
         return new ResponseEntity<List<Word>>(output, responseHeaders, HttpStatus.OK);
     }
 

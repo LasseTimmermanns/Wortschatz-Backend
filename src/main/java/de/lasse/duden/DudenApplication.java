@@ -8,8 +8,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class DudenApplication {
-
-
     public static void main(String[] args) {
         ConfigurableApplicationContext applicationContext = SpringApplication.run(DudenApplication.class, args);
         UserUtil userUtil = applicationContext.getBean(UserUtil.class);
