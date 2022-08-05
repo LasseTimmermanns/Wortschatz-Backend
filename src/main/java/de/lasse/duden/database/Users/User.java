@@ -17,6 +17,11 @@ public class User {
     @Field(name = "session_exp")
     private long sessionExp;
 
+    @Field(name = "own_wordlists")
+    private String[] ownWordlistIds;
+
+    @Field(name = "following_wordlists")
+    private String[] followingWordlistIds;
 
     public User(String subject) {
         this.subject = subject;
@@ -38,6 +43,38 @@ public class User {
 
     public long getSessionExp() {
         return sessionExp;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public void setSessionToken(String sessionToken) {
+        this.sessionToken = sessionToken;
+    }
+
+    public void setSessionIat(long sessionIat) {
+        this.sessionIat = sessionIat;
+    }
+
+    public void setSessionExp(long sessionExp) {
+        this.sessionExp = sessionExp;
+    }
+
+    public String[] getOwnWordlistIds() {
+        return ownWordlistIds;
+    }
+
+    public void setOwnWordlistIds(String[] ownWordlistIds) {
+        this.ownWordlistIds = ownWordlistIds;
+    }
+
+    public String[] getFollowingWordlistIds() {
+        return followingWordlistIds;
+    }
+
+    public void setFollowingWordlistIds(String[] followingWordlistIds) {
+        this.followingWordlistIds = followingWordlistIds;
     }
 
     public User createSession(){
