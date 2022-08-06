@@ -7,6 +7,9 @@ import de.lasse.duden.database.Utilization.UtilizationDisplay;
 import de.lasse.duden.database.Utilization.UtilizationRepository;
 import de.lasse.duden.database.Word.WordRepository;
 import de.lasse.duden.database.Word.Word;
+import de.lasse.duden.database.Wordlists.CustomWordlistRepository;
+import de.lasse.duden.database.Wordlists.Wordlist;
+import de.lasse.duden.database.Wordlists.WordlistDisplay;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +34,9 @@ public class Controller {
 
     @Autowired
     WordRepository wordRepository;
+
+    @Autowired
+    CustomWordlistRepository customWordlistRepository;
 
     @Autowired
     UtilizationRepository utilizationRepository;
@@ -65,6 +71,42 @@ public class Controller {
         return ResponseGenerator.createResponse("Created new Session", out, HttpStatus.OK.value());
     }
 
+    @GetMapping("/get/wordlists")
+    public ResponseEntity getUserWordlists(@RequestParam("token") String token){
+        User user = userRepository.findUserBySessionToken(token);
+        if(user == null) {
+            Logger.getGlobal().info("Get Wordlists invalid token");
+            return ResponseGenerator.createResponse("invalid token", 403);
+        }
+
+        List<WordlistDisplay> wordlists = customWordlistRepository.getUserWordlists(user.getSubject());
+        return new ResponseEntity(wordlists, new HttpHeaders(), 200);
+    }
+
+    @PutMapping("/put/word")
+    public ResponseEntity<String> putWord(@RequestParam("token") String token,
+                                          @RequestParam("word") String word,
+                                          @RequestParam("wordlistids") String wordlistIds){
+
+        User user = userRepository.findUserBySessionToken(token);
+        if(user == null) {
+            Logger.getGlobal().info("Put Word invalid token");
+            return ResponseGenerator.createResponse("Invalid Token", HttpStatus.UNAUTHORIZED.value());
+        }
+
+        String subject = user.getSubject();
+
+        System.out.println(word);
+
+        System.out.println("ids: ");
+        for(String wordlistId : wordlistIds.split(",")){
+            System.out.println(wordlistId);
+            customWordlistRepository.addWordToWordlist(wordlistId, word, subject);
+        }
+
+        return ResponseGenerator.createResponse("Ok", 200);
+    }
+
     @GetMapping("/get/utilization")
     public ResponseEntity<List<UtilizationDisplay>> getUtilizations(@RequestParam("limit") Optional<Integer> limit) {
         long time = System.currentTimeMillis();
@@ -83,6 +125,8 @@ public class Controller {
         HttpHeaders responseHeaders = new HttpHeaders();
         return new ResponseEntity<String>("bar", responseHeaders, HttpStatus.OK);
     }
+
+
 
     @GetMapping("/get/words")
     public ResponseEntity<List<Word>> getWords(@RequestParam("frequency") Optional<Integer> frequencyParam,

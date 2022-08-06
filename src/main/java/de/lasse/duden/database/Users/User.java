@@ -25,6 +25,8 @@ public class User {
 
     public User(String subject) {
         this.subject = subject;
+        this.ownWordlistIds = new String[0];
+        this.followingWordlistIds = new String[0];
     }
 
     public User(){}
