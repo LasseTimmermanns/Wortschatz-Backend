@@ -28,6 +28,5 @@ public class CustomWordlistRepository {
         Query query = new Query(criteria);
         query.fields().include("_id").include("name");
         return mongoTemplate.find(query, WordlistDisplay.class);
-
     }
 }

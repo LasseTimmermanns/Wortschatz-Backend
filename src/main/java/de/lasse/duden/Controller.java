@@ -10,6 +10,7 @@ import de.lasse.duden.database.Word.Word;
 import de.lasse.duden.database.Wordlists.CustomWordlistRepository;
 import de.lasse.duden.database.Wordlists.Wordlist;
 import de.lasse.duden.database.Wordlists.WordlistDisplay;
+import de.lasse.duden.database.Wordlists.WordlistRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +35,9 @@ public class Controller {
 
     @Autowired
     WordRepository wordRepository;
+
+    @Autowired
+    WordlistRepository wordlistRepository;
 
     @Autowired
     CustomWordlistRepository customWordlistRepository;
@@ -83,6 +87,25 @@ public class Controller {
         return new ResponseEntity(wordlists, new HttpHeaders(), 200);
     }
 
+    @PostMapping("/create/wordlist")
+    public ResponseEntity createWordlist(@RequestParam("name") Optional<String> nameParam,
+                                         @RequestParam("token") String token){
+        User user = userRepository.findUserBySessionToken(token);
+        if(user == null) {
+            Logger.getGlobal().info("Create Wordlist invalid token");
+            return ResponseGenerator.createResponse("Invalid Token", HttpStatus.UNAUTHORIZED.value());
+        }
+
+        String owner = user.getSubject();
+        String name = nameParam.orElse("Wörterliste");
+        boolean isPublic = true;
+
+        Wordlist wordlist = new Wordlist(owner, name, isPublic);
+        wordlistRepository.save(wordlist);
+
+        return ResponseGenerator.createResponse("Created new Wordlist " + name + " successful", 200);
+    }
+
     @PutMapping("/put/word")
     public ResponseEntity<String> putWord(@RequestParam("token") String token,
                                           @RequestParam("word") String word,
@@ -96,11 +119,7 @@ public class Controller {
 
         String subject = user.getSubject();
 
-        System.out.println(word);
-
-        System.out.println("ids: ");
         for(String wordlistId : wordlistIds.split(",")){
-            System.out.println(wordlistId);
             customWordlistRepository.addWordToWordlist(wordlistId, word, subject);
         }
 

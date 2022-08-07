@@ -35,6 +35,18 @@ public class Wordlist {
     @Field(name = "words")
     private String[] words;
 
+    public Wordlist(String owner, String name, boolean isPublic) {
+        this.owner = owner;
+        this.name = name;
+        this.isPublic = isPublic;
+        this.follower = new String[0];
+        this.creationDate = System.currentTimeMillis();
+        this.words = new String[0];
+    }
+
+    public Wordlist() {
+    }
+
     public String getId() {
         return id;
     }
