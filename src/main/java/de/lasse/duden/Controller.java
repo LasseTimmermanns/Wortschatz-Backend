@@ -97,7 +97,7 @@ public class Controller {
         }
 
         String owner = user.getSubject();
-        String name = nameParam.orElse("Wörterliste");
+        String name = nameParam.orElse("Wortliste " + (customWordlistRepository.getUserWordlists(owner).size() + 1));
         boolean isPublic = true;
 
         Wordlist wordlist = new Wordlist(owner, name, isPublic);
@@ -136,6 +136,9 @@ public class Controller {
         }
 
         Wordlist wordlist = wordlistRepository.findWordlistById(wordlistId);
+        if(wordlist == null)
+            return ResponseGenerator.createResponse("Wordlist not found", HttpStatus.BAD_REQUEST.value());
+
         if(!wordlist.getOwner().equals(user.getSubject()))
             return ResponseGenerator.createResponse("User is not owner of Wordlist", HttpStatus.UNAUTHORIZED.value());
 
