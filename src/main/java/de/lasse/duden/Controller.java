@@ -126,6 +126,23 @@ public class Controller {
         return ResponseGenerator.createResponse("Ok", 200);
     }
 
+    @DeleteMapping("/delete/wordlist")
+    public ResponseEntity deleteWordlist(@RequestParam("wordlist") String wordlistId,
+                                         @RequestParam("token") String token){
+        User user = userRepository.findUserBySessionToken(token);
+        if(user == null) {
+            Logger.getGlobal().info("Delete Wordlist invalid token");
+            return ResponseGenerator.createResponse("Invalid Token", HttpStatus.UNAUTHORIZED.value());
+        }
+
+        Wordlist wordlist = wordlistRepository.findWordlistById(wordlistId);
+        if(!wordlist.getOwner().equals(user.getSubject()))
+            return ResponseGenerator.createResponse("User is not owner of Wordlist", HttpStatus.UNAUTHORIZED.value());
+
+        wordlistRepository.delete(wordlist);
+        return ResponseGenerator.createResponse("Wordlist deleted successful", 200);
+    }
+
     @GetMapping("/get/utilization")
     public ResponseEntity<List<UtilizationDisplay>> getUtilizations(@RequestParam("limit") Optional<Integer> limit) {
         long time = System.currentTimeMillis();

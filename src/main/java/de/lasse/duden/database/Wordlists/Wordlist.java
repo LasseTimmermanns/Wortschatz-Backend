@@ -42,6 +42,8 @@ public class Wordlist {
         this.follower = new String[0];
         this.creationDate = System.currentTimeMillis();
         this.words = new String[0];
+        this.description = null;
+        this.likes = 0;
     }
 
     public Wordlist() {
