@@ -4,7 +4,7 @@ import de.lasse.duden.ResponseGenerator;
 import de.lasse.duden.database.Users.User;
 import de.lasse.duden.database.Users.UserRepository;
 import de.lasse.duden.database.Wordlists.Wordlist;
-import de.lasse.duden.database.Wordlists.WordlistRepository;
+import de.lasse.duden.database.Wordlists.WordlistInterfaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class DeleteController {
     UserRepository userRepository;
 
     @Autowired
-    WordlistRepository wordlistRepository;
+    WordlistInterfaceRepository wordlistInterfaceRepository;
 
     @DeleteMapping("/wordlist")
     public ResponseEntity deleteWordlist(@RequestParam("wordlist") String wordlistId,
@@ -32,14 +32,14 @@ public class DeleteController {
             return ResponseGenerator.createResponse("Invalid Token", HttpStatus.UNAUTHORIZED.value());
         }
 
-        Wordlist wordlist = wordlistRepository.findWordlistById(wordlistId);
+        Wordlist wordlist = wordlistInterfaceRepository.findWordlistById(wordlistId);
         if(wordlist == null)
             return ResponseGenerator.createResponse("Wordlist not found", HttpStatus.BAD_REQUEST.value());
 
         if(!wordlist.getOwner().equals(user.getSubject()))
             return ResponseGenerator.createResponse("User is not owner of Wordlist", HttpStatus.UNAUTHORIZED.value());
 
-        wordlistRepository.delete(wordlist);
+        wordlistInterfaceRepository.delete(wordlist);
         return ResponseGenerator.createResponse("Wordlist deleted successful", 200);
     }
 }

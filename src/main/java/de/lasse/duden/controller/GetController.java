@@ -1,17 +1,14 @@
 package de.lasse.duden.controller;
 
 import de.lasse.duden.ResponseGenerator;
-import de.lasse.duden.TokenValidator;
 import de.lasse.duden.database.Users.User;
 import de.lasse.duden.database.Users.UserRepository;
-import de.lasse.duden.database.Users.UserUtil;
 import de.lasse.duden.database.Utilization.UtilizationDisplay;
 import de.lasse.duden.database.Utilization.UtilizationRepository;
 import de.lasse.duden.database.Word.Word;
 import de.lasse.duden.database.Word.WordRepository;
 import de.lasse.duden.database.Wordlists.CustomWordlistRepository;
 import de.lasse.duden.database.Wordlists.WordlistDisplay;
-import de.lasse.duden.database.Wordlists.WordlistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,7 +22,6 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/api/get", method = RequestMethod.GET)
 @CrossOrigin
 public class GetController {
 
@@ -41,7 +37,7 @@ public class GetController {
     @Autowired
     UtilizationRepository utilizationRepository;
 
-    @GetMapping("/wordlists")
+    @GetMapping("/api/get/wordlists")
     public ResponseEntity getUserWordlists(@RequestParam("token") String token){
         User user = userRepository.findUserBySessionToken(token);
         if(user == null) {
@@ -53,7 +49,7 @@ public class GetController {
         return new ResponseEntity(wordlists, new HttpHeaders(), 200);
     }
 
-    @GetMapping("/utilization")
+    @GetMapping("/api/get/utilization")
     public ResponseEntity<List<UtilizationDisplay>> getUtilizations(@RequestParam("limit") Optional<Integer> limit) {
         long time = System.currentTimeMillis();
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -66,7 +62,7 @@ public class GetController {
         return new ResponseEntity<>(list, responseHeaders, HttpStatus.OK);
     }
 
-    @GetMapping("/foo")
+    @GetMapping("/api/get/foo")
     public ResponseEntity<String> getFoooooo() {
         HttpHeaders responseHeaders = new HttpHeaders();
         return new ResponseEntity<String>("bar", responseHeaders, HttpStatus.OK);
@@ -74,7 +70,7 @@ public class GetController {
 
 
 
-    @GetMapping("/words")
+    @GetMapping("/api/get/words")
     public ResponseEntity<List<Word>> getWords(@RequestParam("frequency") Optional<Integer> frequencyParam,
                                                @RequestParam("utilization") Optional<String[]> utilizationParam,
                                                @RequestParam("kind") Optional<String[]> kindParam,

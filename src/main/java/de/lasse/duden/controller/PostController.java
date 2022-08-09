@@ -5,11 +5,9 @@ import de.lasse.duden.TokenValidator;
 import de.lasse.duden.database.Users.User;
 import de.lasse.duden.database.Users.UserRepository;
 import de.lasse.duden.database.Users.UserUtil;
-import de.lasse.duden.database.Utilization.UtilizationRepository;
-import de.lasse.duden.database.Word.WordRepository;
 import de.lasse.duden.database.Wordlists.CustomWordlistRepository;
 import de.lasse.duden.database.Wordlists.Wordlist;
-import de.lasse.duden.database.Wordlists.WordlistRepository;
+import de.lasse.duden.database.Wordlists.WordlistInterfaceRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +35,7 @@ public class PostController {
     CustomWordlistRepository customWordlistRepository;
 
     @Autowired
-    WordlistRepository wordlistRepository;
+    WordlistInterfaceRepository wordlistInterfaceRepository;
 
     @PostMapping("/session")
     public ResponseEntity<String> createUserAndSession(@RequestParam("idToken") Optional<String> optIdToken){
@@ -82,7 +80,7 @@ public class PostController {
         boolean isPublic = true;
 
         Wordlist wordlist = new Wordlist(owner, name, isPublic);
-        wordlistRepository.save(wordlist);
+        wordlistInterfaceRepository.save(wordlist);
 
         return ResponseGenerator.createResponse("Created new Wordlist " + name + " successful", 200);
     }
