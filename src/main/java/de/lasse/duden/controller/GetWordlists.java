@@ -1,10 +1,13 @@
 package de.lasse.duden.controller;
 
+import com.google.api.client.json.Json;
 import de.lasse.duden.ResponseGenerator;
 import de.lasse.duden.database.Users.User;
 import de.lasse.duden.database.Users.UserRepository;
 import de.lasse.duden.database.Wordlists.Wordlist;
 import de.lasse.duden.database.Wordlists.WordlistInterfaceRepository;
+import org.bson.json.JsonObject;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -53,30 +56,50 @@ public class GetWordlists {
 
     @GetMapping("/isvalid")
     public ResponseEntity isValid(@RequestParam("wordlistid") String wordlistid){
-        return new ResponseEntity(wordlistInterfaceRepository.findWordlistById(wordlistid) != null, new HttpHeaders(), 200);
+        return new ResponseEntity(wordlistIsValid(wordlistid), new HttpHeaders(), 200);
     }
 
     @GetMapping("/hasaccess")
     public ResponseEntity hasAccess(@RequestParam("wordlistid") String wordlistid,
                                     @RequestParam("token") Optional<String> tokenParam){
+        return ResponseGenerator.createResponse("OK", new JSONObject().put("access", userHasAccess(wordlistid, tokenParam)), 200);
+    }
+
+    @GetMapping("/byid")
+    public Object getById(@RequestParam("wordlistid") String wordlistid,
+                                    @RequestParam("token") Optional<String> tokenParam){
+        if(!wordlistIsValid(wordlistid))
+            return ResponseGenerator.createResponse("Wordlist not found", 400);
+
+        if(!userHasAccess(wordlistid, tokenParam))
+            return ResponseGenerator.createResponse("User has no permission", 400);
+
+        return wordlistInterfaceRepository.findWordlistById(wordlistid);
+    }
+
+    private boolean wordlistIsValid(String wordlistid){
+        return wordlistInterfaceRepository.findWordlistById(wordlistid) != null;
+    }
+
+    private boolean userHasAccess(String wordlistid, Optional<String> tokenParam){
         Wordlist wordlist = wordlistInterfaceRepository.findWordlistById(wordlistid);
         if(wordlist == null)
-            return new ResponseEntity(false, new HttpHeaders(), 200);
+            return false;
 
         if(wordlist.isPublic())
-            return new ResponseEntity(true, new HttpHeaders(), 200);
+            return true;
 
         if(tokenParam.isEmpty())
-            return new ResponseEntity(false, new HttpHeaders(), 200);
+            return false;
 
         User user = userRepository.findUserBySessionToken(tokenParam.orElse(""));
         if(user == null)
-            return new ResponseEntity(false, new HttpHeaders(), 200);
+            return false;
 
         if(wordlist.getOwner().equals(user.getSubject()))
-            return new ResponseEntity(true, new HttpHeaders(), 200);
+            return true;
 
-        return new ResponseEntity(false, new HttpHeaders(), 200);
+        return false;
     }
 
 
