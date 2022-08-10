@@ -1,6 +1,7 @@
 package de.lasse.duden.database.Wordlists;
 
-import de.lasse.duden.database.Users.UserUtil;
+import com.fasterxml.jackson.annotation.JsonView;
+import de.lasse.duden.Views;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -9,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Wordlist {
 
     @Id
+    @JsonView(Views.LearnWordlistView.class)
     private String id;
 
     @Field(name = "owner")
@@ -33,6 +35,7 @@ public class Wordlist {
     private int likes;
 
     @Field(name = "words")
+    @JsonView(Views.LearnWordlistView.class)
     private String[] words;
 
     public Wordlist(String owner, String name, boolean isPublic) {

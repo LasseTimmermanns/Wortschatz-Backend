@@ -1,12 +1,12 @@
 package de.lasse.duden.controller;
 
-import com.google.api.client.json.Json;
+import com.fasterxml.jackson.annotation.JsonView;
 import de.lasse.duden.ResponseGenerator;
+import de.lasse.duden.Views;
 import de.lasse.duden.database.Users.User;
 import de.lasse.duden.database.Users.UserRepository;
 import de.lasse.duden.database.Wordlists.Wordlist;
 import de.lasse.duden.database.Wordlists.WordlistInterfaceRepository;
-import org.bson.json.JsonObject;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -66,6 +66,7 @@ public class GetWordlists {
     }
 
     @GetMapping("/byid")
+    @JsonView(Views.LearnWordlistView.class)
     public Object getById(@RequestParam("wordlistid") String wordlistid,
                                     @RequestParam("token") Optional<String> tokenParam){
         if(!wordlistIsValid(wordlistid))
