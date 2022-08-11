@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class WordRepository {
@@ -17,17 +18,18 @@ public class WordRepository {
     MongoTemplate mongoTemplate;
 
     public List<Word> getWordsWithFilter(Collection<String> utilization, Collection<String> kind, int frequency, int limit){
-        Query query = new Query().limit(limit);
+        //Query query = new Query().limit(limit);
         Criteria criteria = new Criteria();
 
         if(frequency > 1)
-            query.addCriteria(criteria.and("frequency").gte(frequency));
+            criteria.and("frequency").gte(frequency);
 
         if(utilization.size() > 0)
-            query.addCriteria(expandCriteria(criteria,"utilization", utilization));
+            expandCriteria(criteria,"utilization", utilization);
 
         if(kind.size() > 0)
-            query.addCriteria(expandCriteria(criteria,"kind", kind));
+            expandCriteria(criteria, "kind", kind);
+
 
         MatchOperation matchOperation = Aggregation.match(criteria);
         SampleOperation sampleOperation = Aggregation.sample(limit);

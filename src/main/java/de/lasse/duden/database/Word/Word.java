@@ -1,5 +1,7 @@
 package de.lasse.duden.database.Word;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import de.lasse.duden.Views;
 import org.json.JSONObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,6 +13,7 @@ public class Word {
     @Id
     private String id;
 
+    @JsonView(Views.GetWordsView.class)
     private String word;
 
     private String kind, utilization, synonyms, description;
@@ -40,6 +43,37 @@ public class Word {
         return frequency;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setWord(String word) {
+        this.word = word;
+    }
+
+    public void setKind(String kind) {
+        this.kind = kind;
+    }
+
+    public void setUtilization(String utilization) {
+        this.utilization = utilization;
+    }
+
+    public void setSynonyms(String synonyms) {
+        this.synonyms = synonyms;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setFrequency(int frequency) {
+        this.frequency = frequency;
+    }
 
     public JSONObject toJsonObject(){
         JSONObject obj = new JSONObject();

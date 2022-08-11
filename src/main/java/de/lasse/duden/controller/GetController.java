@@ -1,11 +1,14 @@
 package de.lasse.duden.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import de.lasse.duden.ResponseGenerator;
+import de.lasse.duden.Views;
 import de.lasse.duden.database.Users.User;
 import de.lasse.duden.database.Users.UserRepository;
 import de.lasse.duden.database.Utilization.UtilizationDisplay;
 import de.lasse.duden.database.Utilization.UtilizationRepository;
 import de.lasse.duden.database.Word.Word;
+import de.lasse.duden.database.Word.WordInterfaceRepository;
 import de.lasse.duden.database.Word.WordRepository;
 import de.lasse.duden.database.Wordlists.CustomWordlistRepository;
 import de.lasse.duden.database.Wordlists.WordlistDisplay;
@@ -30,6 +33,9 @@ public class GetController {
 
     @Autowired
     WordRepository wordRepository;
+
+    @Autowired
+    WordInterfaceRepository wordInterfaceRepository;
 
     @Autowired
     CustomWordlistRepository customWordlistRepository;
@@ -71,6 +77,7 @@ public class GetController {
 
 
     @GetMapping("/api/get/words")
+    @JsonView(Views.GetWordsView.class)
     public ResponseEntity<List<Word>> getWords(@RequestParam("frequency") Optional<Integer> frequencyParam,
                                                @RequestParam("utilization") Optional<String[]> utilizationParam,
                                                @RequestParam("kind") Optional<String[]> kindParam,
@@ -87,6 +94,20 @@ public class GetController {
         List<Word> output = wordRepository.getWordsWithFilter(utilization, kind, frequency, limit);
         Logger.getGlobal().info("Words Processed Time: " + (System.currentTimeMillis() - time));
         return new ResponseEntity<List<Word>>(output, responseHeaders, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/get/wordinfo")
+    public ResponseEntity getWordInfo(@RequestParam("word") Optional<String> wordParam,
+                                            @RequestParam("wordid") Optional<String> wordidParam){
+        if(!wordParam.isEmpty()){
+            return new ResponseEntity<Word>(wordInterfaceRepository.findWordByWord(wordParam.orElse("")), new HttpHeaders(), 200);
+        }
+
+        if(!wordidParam.isEmpty()){
+            return new ResponseEntity<Word>(wordInterfaceRepository.findWordById(wordidParam.orElse("")), new HttpHeaders(), 200);
+        }
+
+        return ResponseGenerator.createResponse(400);
     }
 
 }
