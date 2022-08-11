@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Word {
 
     @Id
+    @JsonView(Views.GetWordsView.class)
     private String id;
 
     @JsonView(Views.GetWordsView.class)

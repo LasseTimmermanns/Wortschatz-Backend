@@ -99,12 +99,18 @@ public class GetController {
     @GetMapping("/api/get/wordinfo")
     public ResponseEntity getWordInfo(@RequestParam("word") Optional<String> wordParam,
                                             @RequestParam("wordid") Optional<String> wordidParam){
+        long time = System.currentTimeMillis();
+
         if(!wordParam.isEmpty()){
-            return new ResponseEntity<Word>(wordInterfaceRepository.findWordByWord(wordParam.orElse("")), new HttpHeaders(), 200);
+            Word word = wordInterfaceRepository.findWordByWord(wordParam.orElse(""));
+            Logger.getGlobal().info("Words Processed Time: " + (System.currentTimeMillis() - time));
+            return new ResponseEntity<Word>(word, new HttpHeaders(), 200);
         }
 
         if(!wordidParam.isEmpty()){
-            return new ResponseEntity<Word>(wordInterfaceRepository.findWordById(wordidParam.orElse("")), new HttpHeaders(), 200);
+            Word word = wordInterfaceRepository.findWordById(wordidParam.orElse(""));
+            Logger.getGlobal().info("Words Processed Time: " + (System.currentTimeMillis() - time));
+            return new ResponseEntity<Word>(word, new HttpHeaders(), 200);
         }
 
         return ResponseGenerator.createResponse(400);
